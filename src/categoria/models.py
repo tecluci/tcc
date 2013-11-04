@@ -12,8 +12,8 @@ class Category(models.Model):
       (u'Inativo', u'Inativo'),
     )
     
-    name = models.CharField(verbose_name=u"Nome", max_length=50, blank=False, null=False)
-    description = models.CharField(verbose_name=u"Descrição", max_length=90, blank=True)
+    name = models.CharField(verbose_name=u"Categoria", max_length=50, blank=False, null=False)
+    description = models.TextField(verbose_name=u"Descrição", blank=True)
     status = models.CharField(verbose_name=u"Status",max_length=10,blank=False, null=False,choices=STATUS_CHOICES,default='Ativo')
     parent =  models.ForeignKey('self', null=True,blank=True,default=None, related_name='category__self')    
     date_joined = models.DateTimeField(auto_now_add=True)

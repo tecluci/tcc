@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block well %}
+
+
+{%for item in category%}
+<p>{{item.name}}</p>
+{%endfor%}
+
+{% endblock well %}
