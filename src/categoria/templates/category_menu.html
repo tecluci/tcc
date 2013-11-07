@@ -1,0 +1,6 @@
+{%for item in list%}
+	<li><a href="{% url 'questionario' item.id %}">{{item.name}}</a></li>
+{%endfor%}
+
+
+

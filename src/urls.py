@@ -8,7 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'src.questao.views.home', name='home'),
-    url(r'^questionario/$', 'src.questao.views.questionario', name='questionario'),
+    url(r'^questionario/(?P<id>\d+)/$', 'src.questao.views.questionario', name='questionario'),
     # url(r'^src/', include('src.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

@@ -5,7 +5,7 @@ from django.utils.datetime_safe import datetime
 
 
 class CategoryAdmin(admin.ModelAdmin):
-        list_display = ('name','description')        
+        list_display = ('name','description','parent')        
         search_fields = ('name',)
         
 

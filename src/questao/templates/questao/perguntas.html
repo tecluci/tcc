@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
+{% load categoria_extras %}
+
 
 {% block well %}
 
 
 {%for item in category%}
-<p>{{item.name}}</p>
+
+	{% for x in item %}	
+  		<p>{% show_categories_id x.id %}</p>
+  		
+	{%endfor%}  		
 {%endfor%}
 
 {% endblock well %}
