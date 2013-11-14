@@ -12,7 +12,7 @@ def show_categories():
 
 @register.inclusion_tag('category_question_list.html')	
 def show_categories_id(id):    
-    print id
+    #print id
     category =Category.objects.filter(parent_id=1)
     return {'list': category}
 

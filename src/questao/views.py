@@ -4,6 +4,8 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from src.categoria.models import Category
 from src.questao.models import *
+from src.questao.forms import *
+from django.db.models import Q
 
 
 def home(request):
@@ -20,25 +22,21 @@ def questionario(request,id):
     
     category_children=Category.objects.filter(parent_id=id)
 
-    category_children2 = []
     for x in category_children:
-		category_children2.append([x,Category.objects.filter(parent_id=x.id)])
-		
-    print category_children2
+	    x.children  = Category.objects.filter(parent_id=x.id)
+	    for w in x.children:
+	    	w.questao = Questao.objects.filter(Q(categoria_id=w.id) & Q(parent_id=None))
+	    	#listando questoes pai
+	    	for q in w.questao:
+	    		#add questoes filhho a variavel
+	    		q.questao_filho = Questao.objects.filter(Q(parent_id=q.id))
+	    		#add form pai a questao pai
+	    		q.form = RespostaPaiForm(initial={"questao":q})
+	    		#w.form = RespostaFilhoForm()
 
     data = {
-        "category":category_children2,
+        "category":category_children,
     }
 
     return render_to_response('questao/perguntas.html', data, context_instance=RequestContext(request))
 
-def recursive_category(hierarchy):
-    children = hierarchy_parent.objects.filter(parent_id=_hierarchy)
-    if children.count():
-        for x in children:
-            temp = self.recursive_last_level_hierarchy(x.hierarchy_id)
-        return temp
-    else:
-        #caso não exista ele add a lista pq é o o ultimo nivel da hierarquia
-        self.hierarchy_list.append(int(_hierarchy))
-        return self.hierarchy_list

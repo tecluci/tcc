@@ -1,16 +1,42 @@
 {% extends 'base.html' %}
 {% load categoria_extras %}
-
-
 {% block well %}
 
-
 {%for item in category%}
+	<div class="panel panel-primary">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">{{item.name}}</h3>
+	  </div>
+	  <div class="panel-body">
+	    {% for x in item.children %}
+		<legend>
+			<a href="#"><span class="glyphicon glyphicon-tag"></span></a> {{x.name}}
+		</legend>
+		{% for w in x.questao %}
+			<h4>{{w.name}}</h4>
+			{% for form in w.form %}
+				{{form}}
+			{%endfor%}
+			<div class="row ">
+				<div class="col-md-1">
+				</div>
+				<div class="col-md-11">
+					{% for q in w.questao_filho %}
+						<p>{{q.name}}</p>
+					{%endfor%}	
+				</div>
+			</div>
+			
+		{%endfor%}
+		</blockquote> 
+		</blockquote>
+		{%endfor%}
+	  </div>
+	</div>
 
-	{% for x in item %}	
-  		<p>{% show_categories_id x.id %}</p>
-  		
-	{%endfor%}  		
+
+	
+	
 {%endfor%}
 
 {% endblock well %}
