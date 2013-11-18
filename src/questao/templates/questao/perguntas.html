@@ -13,23 +13,39 @@
 			<a href="#"><span class="glyphicon glyphicon-tag"></span></a> {{x.name}}
 		</legend>
 		{% for w in x.questao %}
+			<div class="questaox">
 			<h4>{{w.name}}</h4>
-			{% for form in w.form %}
-				{{form}}
+			
+			{% for form in w.form.resposta %}				
+				<label >{{form.tag}} {{form.choice_label}}</label> 
 			{%endfor%}
-			<div class="row ">
+
+
+			<div class="row respostasfilhas hide">
+			<hr />
 				<div class="col-md-1">
 				</div>
 				<div class="col-md-11">
 					{% for q in w.questao_filho %}
 						<p>{{q.name}}</p>
+						<div class="row ">
+
+							{% for form in q.form.resposta %}
+								
+								<div class="col-md-12">
+									<label ><small>{{form.tag}} {{form.choice_label}}</small></label> <br />
+								</div>	
+								 		
+							{%endfor%}
+						</div>
 					{%endfor%}	
 				</div>
 			</div>
+			</div>
 			
 		{%endfor%}
-		</blockquote> 
-		</blockquote>
+		<br /><br />
+		
 		{%endfor%}
 	  </div>
 	</div>
@@ -40,3 +56,20 @@
 {%endfor%}
 
 {% endblock well %}
+{% block scripts %}
+        
+        
+<script type="text/javascript">
+	$(function(){
+		console.log('carregou');
+		$('label').click(function(){
+			console.log($.trim($(this).text()));
+			if ($.trim($(this).text()) == 'Sim'){
+				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
+			}else if ($.trim($(this).text()) == 'Não'){
+				$(this).parents('.questaox').find('.respostasfilhas').addClass('hide');
+			}
+		})
+	});
+</script>
+{% endblock scripts %}

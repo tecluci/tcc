@@ -25,19 +25,19 @@ class Questao(models.Model):
     def __unicode__(self):
       return self.name
       
-
+RESPOSTA_CHOICES = (
+      (1, u'Atividade Ausente'),
+      (2, u'Atividade Parcialmente Ausente'),
+      (3, u'Atividade Parcialmente Presente'),
+      (4, u'Atividade Presente'),
+    )
 class Resposta(models.Model):
     
     class Meta:
        verbose_name = 'Resposta'
 
     
-    RESPOSTA_CHOICES = (
-      (1, u'Atividade Ausente'),
-      (2, u'Atividade Parcialmente Ausente'),
-      (3, u'Atividade Parcialmente Presente'),
-      (4, u'Atividade Presente'),
-    )
+    
     
     resposta = models.CharField(verbose_name=u"Pergunta", blank=False, null=False,max_length=30,choices=RESPOSTA_CHOICES)
     questao =  models.ForeignKey(Questao, null=False,blank=False, related_name='questao__resposta')    

@@ -27,12 +27,13 @@ def questionario(request,id):
 	    for w in x.children:
 	    	w.questao = Questao.objects.filter(Q(categoria_id=w.id) & Q(parent_id=None))
 	    	#listando questoes pai
-	    	for q in w.questao:
-	    		#add questoes filhho a variavel
-	    		q.questao_filho = Questao.objects.filter(Q(parent_id=q.id))
+	    	for q in w.questao:	    		
 	    		#add form pai a questao pai
 	    		q.form = RespostaPaiForm(initial={"questao":q})
-	    		#w.form = RespostaFilhoForm()
+	    		#add questoes filho a variavel
+	    		q.questao_filho = Questao.objects.filter(Q(parent_id=q.id))
+	    		for qw in q.questao_filho:	    			
+	    			qw.form = RespostaFilhoForm(initial={"questao":qw})
 
     data = {
         "category":category_children,
