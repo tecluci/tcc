@@ -37,9 +37,8 @@ class Resposta(models.Model):
        verbose_name = 'Resposta'
 
     
-    
-    
-    resposta = models.CharField(verbose_name=u"Pergunta", blank=False, null=False,max_length=30,choices=RESPOSTA_CHOICES)
+    resposta = models.CharField(verbose_name=u"Pergunta", blank=False, null=False,max_length=30)
+    skey = models.CharField(blank=True, null=True,max_length=255)
     questao =  models.ForeignKey(Questao, null=False,blank=False, related_name='questao__resposta')    
     date_joined = models.DateTimeField(auto_now_add=True)
      

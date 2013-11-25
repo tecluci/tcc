@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'src.questao.views.home', name='home'),
     url(r'^questionario/(?P<id>\d+)/$', 'src.questao.views.questionario', name='questionario'),
+    url(r'^send-post/$', 'src.questao.views.senderpost', name='senderpost'),
+    url(r'^send-post2/$', 'src.questao.views.senderpost2', name='senderpost2'),
     # url(r'^src/', include('src.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

@@ -15,11 +15,15 @@
 		{% for w in x.questao %}
 			<div class="questaox">
 			<h4>{{w.name}}</h4>
-			
-			{% for form in w.form.resposta %}				
-				<label >{{form.tag}} {{form.choice_label}}</label> 
-			{%endfor%}
-
+			<form action="{% url 'senderpost' %}" method="post">
+				{% csrf_token %}
+				{{w.form.questao}}
+				{% for form in w.form.resposta %}
+				
+					<label class='pai' >{{form.tag}} {{form.choice_label}}</label> 
+				{%endfor%}
+				<button type="submit">ok</button>
+			</form>
 
 			<div class="row respostasfilhas hide">
 			<hr />
@@ -29,14 +33,18 @@
 					{% for q in w.questao_filho %}
 						<p>{{q.name}}</p>
 						<div class="row ">
-
+							<form action="{% url 'senderpost2' %}" method="post">
+								{% csrf_token %}
+								{{q.form.questao}}
 							{% for form in q.form.resposta %}
 								
 								<div class="col-md-12">
-									<label ><small>{{form.tag}} {{form.choice_label}}</small></label> <br />
+									<label class='filho'><small>{{form.tag}} {{form.choice_label}}</small></label> <br />
 								</div>	
-								 		
+									
 							{%endfor%}
+							<button type="submit">ok</button>
+							</form>	 		
 						</div>
 					{%endfor%}	
 				</div>
@@ -61,13 +69,20 @@
         
 <script type="text/javascript">
 	$(function(){
-		console.log('carregou');
-		$('label').click(function(){
-			console.log($.trim($(this).text()));
+		
+		$('.pai').click(function(){			
 			if ($.trim($(this).text()) == 'Sim'){
 				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
 			}else if ($.trim($(this).text()) == 'Não'){
+				$.ajax(
+					url:"{% url 'senderpost' %}",
+					method:'post',
+					data:$(this).parents('.questaox').find('form').serialize(),
+					success:function(data){
+						console.log(data);
+				});
 				$(this).parents('.questaox').find('.respostasfilhas').addClass('hide');
+				return false;
 			}
 		})
 	});

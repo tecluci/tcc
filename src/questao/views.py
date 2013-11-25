@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from src.categoria.models import Category
 from src.questao.models import *
 from src.questao.forms import *
@@ -41,3 +41,29 @@ def questionario(request,id):
 
     return render_to_response('questao/perguntas.html', data, context_instance=RequestContext(request))
 
+
+def senderpost(request):
+	if request.POST: #verifica se existe POST		
+		form = RespostaPaiForm(request.POST) #chama o form dos forms.py e add os dados do POST
+		
+		if form.is_valid: 			
+			form_s = form.save(commit=False)
+			form_s.skey = request.session.session_key
+			form_s.save()
+			return HttpResponse('1')
+
+	
+	return HttpResponse('ok')
+
+def senderpost2(request):
+	if request.POST: #verifica se existe POST		
+		form = RespostaFilhoForm(request.POST) #chama o form dos forms.py e add os dados do POST
+		
+		if form.is_valid: 			
+			form_s = form.save(commit=False)
+			form_s.skey = request.session.session_key
+			form_s.save()
+			return HttpResponse('1')
+
+	
+	return HttpResponse('ok')
