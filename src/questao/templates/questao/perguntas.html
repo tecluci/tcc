@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load categoria_extras %}
+{% load humanize %}
 {% block well %}
 
 {%for item in category%}
@@ -15,14 +16,20 @@
 		{% for w in x.questao %}
 			<div class="questaox">
 			<h4>{{w.name}}</h4>
-			<form action="{% url 'senderpost' %}" method="post">
+			<form action="{% url 'senderpost' %}" class='form-pai' method="post">
 				{% csrf_token %}
 				{{w.form.questao}}
 				{% for form in w.form.resposta %}
 				
 					<label class='pai' >{{form.tag}} {{form.choice_label}}</label> 
 				{%endfor%}
-				<button type="submit">ok</button>
+				<p class='pull-right'>
+				<small class="text-muted date_joined">
+				{%if w.resposta.date_joined %}	
+				<span class='glyphicon glyphicon-ok'></span> Salvo {{w.resposta.date_joined|naturaltime}}
+				{%endif%}
+				</small>
+				</p>
 			</form>
 
 			<div class="row respostasfilhas hide">
@@ -70,19 +77,24 @@
 <script type="text/javascript">
 	$(function(){
 		
-		$('.pai').click(function(){			
+		$('.pai').click(function(){
+			var $this = $(this);			
 			if ($.trim($(this).text()) == 'Sim'){
 				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
 			}else if ($.trim($(this).text()) == 'Não'){
-				$.ajax(
+				$.ajax({
 					url:"{% url 'senderpost' %}",
-					method:'post',
-					data:$(this).parents('.questaox').find('form').serialize(),
+					type:'post',
+					data:$(this).parents('.questaox').find('.form-pai').serialize(),
 					success:function(data){
 						console.log(data);
+						$this.parents('form').find('.date_joined').text(data);
+					}
 				});
+
+				
 				$(this).parents('.questaox').find('.respostasfilhas').addClass('hide');
-				return false;
+				//return false;
 			}
 		})
 	});

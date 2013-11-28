@@ -19,7 +19,7 @@ def home(request):
 
 def questionario(request,id):
     category=Category.objects.filter(id=id)
-    
+    print request.session.session_key
     category_children=Category.objects.filter(parent_id=id)
 
     for x in category_children:
@@ -29,7 +29,15 @@ def questionario(request,id):
 	    	#listando questoes pai
 	    	for q in w.questao:	    		
 	    		#add form pai a questao pai
-	    		q.form = RespostaPaiForm(initial={"questao":q})
+	    		#verifica se existe respota no banco de dados
+	    		try:
+	    			r = Resposta.objects.get(Q(questao=q) & Q(skey=request.session.session_key))
+	    			q.form = RespostaPaiForm(instance=r)
+	    			q.resposta = r
+	    			
+	    		except:
+	    			q.form = RespostaPaiForm(initial={"questao":q})
+
 	    		#add questoes filho a variavel
 	    		q.questao_filho = Questao.objects.filter(Q(parent_id=q.id))
 	    		for qw in q.questao_filho:	    			
@@ -41,16 +49,20 @@ def questionario(request,id):
 
     return render_to_response('questao/perguntas.html', data, context_instance=RequestContext(request))
 
-
+from django.contrib.humanize.templatetags.humanize import naturaltime
 def senderpost(request):
 	if request.POST: #verifica se existe POST		
 		form = RespostaPaiForm(request.POST) #chama o form dos forms.py e add os dados do POST
-		
+		print request.session.session_key
 		if form.is_valid: 			
 			form_s = form.save(commit=False)
 			form_s.skey = request.session.session_key
 			form_s.save()
-			return HttpResponse('1')
+			msg = "<span class='glyphicon glyphicon-ok'></span> salvo %s"%naturaltime(form_s.date_joined)
+			response = HttpResponse(msg,content_type="application/liquid")
+			response['Content-Length'] = len(msg)
+
+			return response
 
 	
 	return HttpResponse('ok')
