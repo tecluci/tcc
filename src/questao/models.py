@@ -26,10 +26,10 @@ class Questao(models.Model):
       return self.name
       
 RESPOSTA_CHOICES = (
-      (1, u'Atividade Ausente'),
-      (2, u'Atividade Parcialmente Ausente'),
-      (3, u'Atividade Parcialmente Presente'),
-      (4, u'Atividade Presente'),
+      (0, u'Atividade Ausente'),
+      (1, u'Atividade Parcialmente Ausente'),
+      (2, u'Atividade Parcialmente Presente'),
+      (3, u'Atividade Presente'),
     )
 class Resposta(models.Model):
     

@@ -19,7 +19,7 @@ def home(request):
 
 def questionario(request,id):
     category=Category.objects.filter(id=id)
-    print request.session.session_key
+    #print request.session.session_key
     category_children=Category.objects.filter(parent_id=id)
 
     for x in category_children:
@@ -40,8 +40,13 @@ def questionario(request,id):
 
 	    		#add questoes filho a variavel
 	    		q.questao_filho = Questao.objects.filter(Q(parent_id=q.id))
-	    		for qw in q.questao_filho:	    			
-	    			qw.form = RespostaFilhoForm(initial={"questao":qw})
+	    		for qw in q.questao_filho:
+	    			try:
+		    			rw = Resposta.objects.get(Q(questao=qw) & Q(skey=request.session.session_key))
+		    			qw.form = RespostaFilhoForm(instance=rw)
+		    			qw.resposta = rw	    			
+		    		except:		    			
+	    				qw.form = RespostaFilhoForm(initial={"questao":qw})
 
     data = {
         "category":category_children,
@@ -50,17 +55,24 @@ def questionario(request,id):
     return render_to_response('questao/perguntas.html', data, context_instance=RequestContext(request))
 
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.utils.html import escape
+
 def senderpost(request):
 	if request.POST: #verifica se existe POST		
-		form = RespostaPaiForm(request.POST) #chama o form dos forms.py e add os dados do POST
-		print request.session.session_key
+
+		try:
+			r = Resposta.objects.get(Q(questao_id=request.POST['questao']) & Q(skey=request.session.session_key))
+			form = RespostaPaiForm(request.POST, instance=r)
+		except:			
+			form = RespostaPaiForm(request.POST) #chama o form dos forms.py e add os dados do POST
+		#print request.session.session_key
 		if form.is_valid: 			
 			form_s = form.save(commit=False)
 			form_s.skey = request.session.session_key
 			form_s.save()
-			msg = "<span class='glyphicon glyphicon-ok'></span> salvo %s"%naturaltime(form_s.date_joined)
-			response = HttpResponse(msg,content_type="application/liquid")
-			response['Content-Length'] = len(msg)
+			msg = " salvo %s"%naturaltime(form_s.date_joined)
+			response = HttpResponse(escape(msg))
+				
 
 			return response
 
@@ -69,13 +81,32 @@ def senderpost(request):
 
 def senderpost2(request):
 	if request.POST: #verifica se existe POST		
-		form = RespostaFilhoForm(request.POST) #chama o form dos forms.py e add os dados do POST
-		
+		try:
+			r = Resposta.objects.get(Q(questao_id=request.POST['questao']) & Q(skey=request.session.session_key))
+			form = RespostaFilhoForm(request.POST, instance=r)
+		except:			
+			form = RespostaFilhoForm(request.POST) #chama o form dos forms.py e add os dados do POST
+			r = None
 		if form.is_valid: 			
 			form_s = form.save(commit=False)
 			form_s.skey = request.session.session_key
 			form_s.save()
-			return HttpResponse('1')
+			
+			r_list = []
+			if r:
+				for x in Questao.objects.filter(Q(parent_id=r.questao.parent_id)):
+					try:
+						res = Resposta.objects.get(Q(questao=x) & Q(skey=request.session.session_key))		
+						r_list.append(int(res.resposta))
+					except:	
+						r_list.append(0)
+				media = sum(r_list) / float(len(r_list))
+				print media
+				Resposta.objects.filter(Q(questao__id=r.questao.parent_id)).update(resposta=media)
+				
+			msg = " salvo %s"%naturaltime(form_s.date_joined)
+			response = HttpResponse(escape(msg))
+			return response
 
 	
 	return HttpResponse('ok')

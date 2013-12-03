@@ -38,20 +38,30 @@
 				</div>
 				<div class="col-md-11">
 					{% for q in w.questao_filho %}
-						<p>{{q.name}}</p>
-						<div class="row ">
-							<form action="{% url 'senderpost2' %}" method="post">
-								{% csrf_token %}
-								{{q.form.questao}}
-							{% for form in q.form.resposta %}
-								
-								<div class="col-md-12">
-									<label class='filho'><small>{{form.tag}} {{form.choice_label}}</small></label> <br />
-								</div>	
+						<div class="questaow">
+							<p>{{q.name}}</p>
+							<p class='pull-right'>
+									<small class="text-muted date_joined2">
+										{%if q.resposta.date_joined %}	
+											<span class='glyphicon glyphicon-ok'></span> Salvo {{q.resposta.date_joined|naturaltime}}
+										{%endif%}
+									</small>
+								</p>
+							<div class="row ">
+								<form action="{% url 'senderpost2' %}" class='form-filho' method="post">
+									{% csrf_token %}
+									{{q.form.questao}}
+								{% for form in q.form.resposta %}
 									
-							{%endfor%}
-							<button type="submit">ok</button>
-							</form>	 		
+									<div class="col-md-12">
+										<label class='filho'><small>{{form.tag}} {{form.choice_label}}</small></label> <br />
+										
+									</div>	
+										
+								{%endfor%}
+								
+								</form>	 		
+							</div>
 						</div>
 					{%endfor%}	
 				</div>
@@ -76,9 +86,19 @@
         
 <script type="text/javascript">
 	$(function(){
-		
+		$('.radiox').each(function( index ) {			
+			if ($(this).attr('checked') == 'checked'){
+				//console.log( index + ": " + $( this ).val());
+				if ($( this ).val() > 0){
+					$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');	
+				}
+			}
+		});
+
+
 		$('.pai').click(function(){
-			var $this = $(this);			
+			var $this = $(this);
+			
 			if ($.trim($(this).text()) == 'Sim'){
 				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
 			}else if ($.trim($(this).text()) == 'Não'){
@@ -86,8 +106,7 @@
 					url:"{% url 'senderpost' %}",
 					type:'post',
 					data:$(this).parents('.questaox').find('.form-pai').serialize(),
-					success:function(data){
-						console.log(data);
+					success:function(data){						
 						$this.parents('form').find('.date_joined').text(data);
 					}
 				});
@@ -96,6 +115,19 @@
 				$(this).parents('.questaox').find('.respostasfilhas').addClass('hide');
 				//return false;
 			}
+		});
+
+		$('.filho').click(function(){
+			var $this = $(this);
+			$.ajax({
+				url:"{% url 'senderpost2' %}",
+				type:'post',
+				data:$this.parents('.questaow').find('.form-filho').serialize(),
+				success:function(data){					
+					$this.parents('.questaow').find('.date_joined2').text(data);
+				}
+			});
+			
 		})
 	});
 </script>
