@@ -15,7 +15,7 @@
 		</legend>
 		{% for w in x.questao %}
 			<div class="questaox">
-			<h4>{{w.name}}</h4>
+			<h4>{{w.id}} - {{w.name}}</h4>
 			<form action="{% url 'senderpost' %}" class='form-pai' method="post">
 				{% csrf_token %}
 				{{w.form.questao}}
@@ -76,9 +76,17 @@
 	</div>
 
 
-	
+
 	
 {%endfor%}
+
+	<div class="row">
+		<div class="col-md-12 text-center">
+			<a href="{% url 'home' %}" class="btn btn-default btn-lg">Cancelar</a>
+			<a href="{% url 'report' cat_id %}" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-ok-sign"></span> Enviar</a>
+			
+		</div>
+	</div>
 
 {% endblock well %}
 {% block scripts %}
@@ -88,8 +96,8 @@
 	$(function(){
 		$('.radiox').each(function( index ) {			
 			if ($(this).attr('checked') == 'checked'){
-				//console.log( index + ": " + $( this ).val());
-				if ($( this ).val() > 0){
+				console.log( index + ": " + $( this ).parents('.pai').text());
+				if ($( this ).parents('.pai').text() > "Sim"){
 					$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');	
 				}
 			}
@@ -98,23 +106,21 @@
 
 		$('.pai').click(function(){
 			var $this = $(this);
-			
-			if ($.trim($(this).text()) == 'Sim'){
-				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
-			}else if ($.trim($(this).text()) == 'Não'){
-				$.ajax({
-					url:"{% url 'senderpost' %}",
-					type:'post',
-					data:$(this).parents('.questaox').find('.form-pai').serialize(),
-					success:function(data){						
-						$this.parents('form').find('.date_joined').text(data);
-					}
-				});
+			$this.find('input').val(0);
+			$.ajax({
+				url:"{% url 'senderpost' %}",
+				type:'post',
+				data:$(this).parents('.questaox').find('.form-pai').serialize(),
+				success:function(data){						
+					$this.parents('form').find('.date_joined').text(data);
 
-				
-				$(this).parents('.questaox').find('.respostasfilhas').addClass('hide');
-				//return false;
-			}
+					if ($.trim($this.text()) == 'Sim'){
+						$this.parents('.questaox').find('.respostasfilhas').removeClass('hide');
+					}else if ($.trim($this.text()) == 'Não'){
+						$this.parents('.questaox').find('.respostasfilhas').addClass('hide');
+					}
+				}
+			});
 		});
 
 		$('.filho').click(function(){

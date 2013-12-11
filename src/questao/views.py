@@ -50,6 +50,7 @@ def questionario(request,id):
 
     data = {
         "category":category_children,
+        'cat_id':id,
     }
 
     return render_to_response('questao/perguntas.html', data, context_instance=RequestContext(request))
@@ -93,6 +94,7 @@ def senderpost2(request):
 			form_s.save()
 			
 			r_list = []
+			r = Resposta.objects.get(Q(questao_id=form_s.questao_id) & Q(skey=request.session.session_key))
 			if r:
 				for x in Questao.objects.filter(Q(parent_id=r.questao.parent_id)):
 					try:
@@ -101,7 +103,7 @@ def senderpost2(request):
 					except:	
 						r_list.append(0)
 				media = sum(r_list) / float(len(r_list))
-				print media
+				
 				Resposta.objects.filter(Q(questao__id=r.questao.parent_id)).update(resposta=media)
 				
 			msg = " salvo %s"%naturaltime(form_s.date_joined)
@@ -110,3 +112,37 @@ def senderpost2(request):
 
 	
 	return HttpResponse('ok')
+
+
+def report(request,id_cat):
+	category_children=[v.id for v in Category.objects.filter(parent_id=id_cat)]
+	category_children2=[v.id for v in Category.objects.filter(parent_id__in=category_children)]
+	q = Questao.objects.filter(Q(categoria_id__in=category_children2) & Q(parent_id=None))
+	
+	c = q.count()
+	r_list = []
+	cat = ""
+	media = 0
+
+	r_list_max = []
+	for x in q:
+		cat = x.categoria
+		
+		#try:
+		res = Resposta.objects.get(Q(questao=x) & Q(skey=request.session.session_key))
+		re = res.resposta
+		r_list.append(float(re))
+		r_list_max.append(3)			
+		#except:	
+		#	re = 0
+		#	r_list.append(re)
+	media = sum(r_list)
+	max_res = sum(r_list_max)	
+	percent = (media*100)/max_res
+	
+	data = {
+        "category":cat,        
+        'media':percent,
+    }	
+	return render_to_response('questao/relatorio.html', data, context_instance=RequestContext(request))
+
