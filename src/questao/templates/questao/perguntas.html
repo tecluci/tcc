@@ -15,14 +15,16 @@
 		</legend>
 		{% for w in x.questao %}
 			<div class="questaox">
-			<h4>{{w.id}} - {{w.name}}</h4>
+			<h4>{{w.name}}</h4>
 			<form action="{% url 'senderpost' %}" class='form-pai' method="post">
 				{% csrf_token %}
 				{{w.form.questao}}
-				{% for form in w.form.resposta %}
 				
-					<label class='pai' >{{form.tag}} {{form.choice_label}}</label> 
+				{% for form in w.form.resposta %}				
+					<label class='pai {{form.choice_label}}
+						{%if not w.resposta.resposta == "0" and form.choice_label == "Sim" %} checked {%endif%}' >{{form.tag}} {{form.choice_label}}</label> 
 				{%endfor%}
+				<input type='hidden' class="qresposta" name="qresposta" value="{{w.resposta.resposta}}" />
 				<p class='pull-right'>
 				<small class="text-muted date_joined">
 				{%if w.resposta.date_joined %}	
@@ -94,33 +96,37 @@
         
 <script type="text/javascript">
 	$(function(){
-		$('.radiox').each(function( index ) {			
-			if ($(this).attr('checked') == 'checked'){
-				console.log( index + ": " + $( this ).parents('.pai').text());
-				if ($( this ).parents('.pai').text() > "Sim"){
-					$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');	
-				}
+		$('.qresposta').each(function( index ) {			
+			//console.log(index+'-'+$(this).val())
+			if ($(this).val() > 0){
+				$(this).parent('.form-pai').find('.Sim input').attr('checked','checked');
+				$(this).parents('.questaox').find('.respostasfilhas').removeClass('hide');
 			}
+			
 		});
 
 
 		$('.pai').click(function(){
 			var $this = $(this);
-			$this.find('input').val(0);
-			$.ajax({
-				url:"{% url 'senderpost' %}",
-				type:'post',
-				data:$(this).parents('.questaox').find('.form-pai').serialize(),
-				success:function(data){						
-					$this.parents('form').find('.date_joined').text(data);
+			console.log($this.find('input').attr('checked'))
+			if (!$this.hasClass('checked')){
+				$.ajax({
+					url:"{% url 'senderpost' %}",
+					type:'post',
+					data:$(this).parents('.questaox').find('.form-pai').serialize(),
+					success:function(data){						
+						$this.parents('form').find('.date_joined').text(data);
 
-					if ($.trim($this.text()) == 'Sim'){
-						$this.parents('.questaox').find('.respostasfilhas').removeClass('hide');
-					}else if ($.trim($this.text()) == 'Não'){
-						$this.parents('.questaox').find('.respostasfilhas').addClass('hide');
+						if ($.trim($this.text()) == 'Sim'){
+							$this.parents('.questaox').find('.respostasfilhas').removeClass('hide');
+							//$this.find('input').val('Sim');
+						}else if ($.trim($this.text()) == 'Não'){
+							$this.parents('.questaox').find('.respostasfilhas').addClass('hide');
+
+						}
 					}
-				}
-			});
+				});
+			}
 		});
 
 		$('.filho').click(function(){

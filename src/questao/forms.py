@@ -17,7 +17,7 @@ class RespostaPaiForm(forms.ModelForm):
 
 	CHOICES_BOOLEAN = (
 		(0,u'Não'),
-		(3,u'Sim'),
+		(1,u'Sim'),
 	)
 	
 	resposta = forms.ChoiceField(widget=forms.RadioSelect,choices=CHOICES_BOOLEAN)	

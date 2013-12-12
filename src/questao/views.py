@@ -60,14 +60,18 @@ from django.utils.html import escape
 
 def senderpost(request):
 	if request.POST: #verifica se existe POST		
-
+		saved = False
 		try:
 			r = Resposta.objects.get(Q(questao_id=request.POST['questao']) & Q(skey=request.session.session_key))
 			form = RespostaPaiForm(request.POST, instance=r)
-		except:			
+			saved = True			
+					
+		except:		
+			saved = True	
 			form = RespostaPaiForm(request.POST) #chama o form dos forms.py e add os dados do POST
+			r = None
 		#print request.session.session_key
-		if form.is_valid: 			
+		if form.is_valid() and saved:
 			form_s = form.save(commit=False)
 			form_s.skey = request.session.session_key
 			form_s.save()
@@ -76,9 +80,11 @@ def senderpost(request):
 				
 
 			return response
+		
+			
 
 	
-	return HttpResponse('ok')
+	return HttpResponse('salvo')
 
 def senderpost2(request):
 	if request.POST: #verifica se existe POST		
@@ -88,7 +94,7 @@ def senderpost2(request):
 		except:			
 			form = RespostaFilhoForm(request.POST) #chama o form dos forms.py e add os dados do POST
 			r = None
-		if form.is_valid: 			
+		if form.is_valid(): 			
 			form_s = form.save(commit=False)
 			form_s.skey = request.session.session_key
 			form_s.save()
@@ -119,30 +125,29 @@ def report(request,id_cat):
 	category_children2=[v.id for v in Category.objects.filter(parent_id__in=category_children)]
 	q = Questao.objects.filter(Q(categoria_id__in=category_children2) & Q(parent_id=None))
 	
-	c = q.count()
+	nquestoes = q.count()
 	r_list = []
-	cat = ""
-	media = 0
+	
+	soma = 0
 
-	r_list_max = []
-	for x in q:
-		cat = x.categoria
+	
+	for x in q:		
 		
-		#try:
-		res = Resposta.objects.get(Q(questao=x) & Q(skey=request.session.session_key))
-		re = res.resposta
-		r_list.append(float(re))
-		r_list_max.append(3)			
-		#except:	
-		#	re = 0
-		#	r_list.append(re)
-	media = sum(r_list)
-	max_res = sum(r_list_max)	
-	percent = (media*100)/max_res
+		try:
+			res = Resposta.objects.get(Q(questao=x) & Q(skey=request.session.session_key))
+			re = res.resposta
+			r_list.append(float(re))	
+		except:	
+			re = 0
+			r_list.append(re)
+	soma = sum(r_list)
+	pontuacao_maxima = nquestoes*3	
+	percent = int(round((soma*100)/pontuacao_maxima))
 	
 	data = {
-        "category":cat,        
+        "category":Category.objects.get(id=id_cat),        
         'media':percent,
+
     }	
 	return render_to_response('questao/relatorio.html', data, context_instance=RequestContext(request))
 

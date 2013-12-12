@@ -2,7 +2,8 @@
 {% load categoria_extras %}
 {% load humanize %}
 {% block well %}
-<h3>{{cat}}</h3>
-{{media}}
+<h3>{{category.name}}</h3>
+
+<div class="alert alert-success">{{media}}%</div>
 {% endblock well %}
 
