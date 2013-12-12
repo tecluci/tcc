@@ -22,7 +22,7 @@
 				
 				{% for form in w.form.resposta %}				
 					<label class='pai {{form.choice_label}}
-						{%if not w.resposta.resposta == "0" and form.choice_label == "Sim" %} checked {%endif%}' >{{form.tag}} {{form.choice_label}}</label> 
+						{%if w.resposta.resposta and not w.resposta.resposta == "0" and form.choice_label == "Sim" %} checked {%endif%}' >{{form.tag}} {{form.choice_label}}</label> 
 				{%endfor%}
 				<input type='hidden' class="qresposta" name="qresposta" value="{{w.resposta.resposta}}" />
 				<p class='pull-right'>
@@ -108,7 +108,7 @@
 
 		$('.pai').click(function(){
 			var $this = $(this);
-			console.log($this.find('input').attr('checked'))
+			//console.log($this.find('input').attr('checked'))
 			if (!$this.hasClass('checked')){
 				$.ajax({
 					url:"{% url 'senderpost' %}",
@@ -119,10 +119,11 @@
 
 						if ($.trim($this.text()) == 'Sim'){
 							$this.parents('.questaox').find('.respostasfilhas').removeClass('hide');
+							$this.addClass('checked');
 							//$this.find('input').val('Sim');
 						}else if ($.trim($this.text()) == 'Não'){
 							$this.parents('.questaox').find('.respostasfilhas').addClass('hide');
-
+							$this.parent('.form-pai').find('.Sim').removeClass('checked');
 						}
 					}
 				});
